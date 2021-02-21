@@ -1,0 +1,138 @@
+- hosts: master
+  become: yes
+  tasks:
+    - name: Add workers from inventory to /etc/hosts file
+      lineinfile:
+        dest: /etc/hosts
+        line: "{{ hostvars[item].ansible_host }} {{item}}"
+        state: present
+      when: hostvars[item].ansible_host is defined
+      with_items: "{{ groups.workers }}"
+
+    - name: Add user for Kubernetes operator (password test)
+      user:
+        name: operator
+        shell: /bin/bash
+        groups: sudo
+        password: "{{ 'test' | password_hash('sha512') }}"
+        append: yes
+    
+    - name: Create directory for Kubernetes config
+      file:
+        path: /home/operator/.kube
+        owner: operator
+        group: operator
+        state: directory
+        mode: '0700'
+
+- hosts: workers
+  become: yes
+  tasks:
+    - name: Add master from inventory to /etc/hosts file
+      lineinfile:
+        dest: /etc/hosts
+        line: "{{ hostvars[item].ansible_host }} {{item}}"
+        state: present
+      when: hostvars[item].ansible_host is defined
+      with_items: "{{ groups.master }}"
+
+- hosts: all
+  become: yes
+  tasks:
+    - name: Modify hostname to match value from inventory
+      hostname:
+        name: "{{ inventory_hostname }}"
+
+    - name: Modify /etc/hosts file 127.0.1.1 entry to match inventory name
+      lineinfile:
+        path: /etc/hosts
+        regexp: '^127\.0\.1\.1'
+        line: "127.0.1.1 {{ inventory_hostname }}"
+        backup: yes
+
+    - name: Disable swap (command)
+      command: swapoff -a
+ 
+    - name: Disable swap - remove line from /etc/fstab
+      lineinfile:
+        path: /etc/fstab
+        regexp: '\/swapfile'
+        state: absent
+        backup: yes
+
+    - name: Install dependencies
+      apt:
+        name: "{{ packages }}"
+        update_cache: yes
+        force_apt_get: yes
+      vars:
+        packages:
+        - apt-transport-https
+        - ca-certificates
+        - gnupg-agent
+        - software-properties-common
+        - gnupg
+  
+    - name: Add modules for containerd
+      blockinfile:
+        path: /etc/modules-load.d/containerd.conf
+        create: yes
+        block: |
+          overlay
+          br_netfilter
+
+    - name: modprobe overlay
+      command: modprobe overlay
+
+    - name: modprobe br_netfilter
+      command: modprobe br_netfilter
+  
+    - name: Set sysctl parameters
+      blockinfile:
+        path: /etc/sysctl.d/99-kubernetes-cri.conf
+        create: yes
+        block: |
+          net.bridge.bridge-nf-call-iptables = 1
+          net.ipv4.ip_forward = 1
+          net.bridge.bridge-nf-call-ip6tables = 1
+
+    - name: Apply sysctl parameters
+      command: sysctl --system
+
+    - name: Install containerd
+      apt:
+        name: containerd
+        force_apt_get: yes
+        update_cache: yes
+  
+    - name: Create directory for containerd configuration
+      file:
+        path: /etc/containerd
+        state: directory
+  
+    - name: Containerd configuration
+      shell: containerd config default | sudo tee /etc/containerd/config.toml
+
+    - name: Restart containerd
+      command: systemctl restart containerd
+      
+    - name: Add Kubernetes Apt signing key
+      apt_key:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        state: present
+  
+    - name: Add kubernetes repository into sources list
+      apt_repository:
+        repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+        state: present
+  
+    - name: Install packages for kubernetes
+      apt:
+        name: "{{ packages }}"
+        update_cache: yes
+        force_apt_get: yes
+      vars:
+        packages:
+        - kubelet={{ k8s_version }}
+        - kubeadm={{ k8s_version }}
+        - kubectl={{ k8s_version }}

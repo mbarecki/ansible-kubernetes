@@ -1,0 +1,4 @@
+k8s_version: 1.20.4-00
+calicoctl_version: v3.17.3
+service_Subnet: 10.95.0.0/16
+pod_Subnet: 10.245.0.0/16

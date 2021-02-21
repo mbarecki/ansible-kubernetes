@@ -1,0 +1,10 @@
+---
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: ClusterConfiguration
+networking:
+  serviceSubnet: {{ service_Subnet }}
+  podSubnet: {{ pod_Subnet }}
+---
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+cgroupDriver: systemd

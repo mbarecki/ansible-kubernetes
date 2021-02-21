@@ -1,0 +1,24 @@
+- hosts: master
+  become: yes
+  tasks:
+    - name: Download calicoctl
+      get_url:
+        url: https://github.com/projectcalico/calicoctl/releases/download/{{ calicoctl_version }}/calicoctl
+        dest: /usr/local/bin/calicoctl
+        mode: '0555'
+    
+    - name: Change calicoctl ownership, group and permissions
+      file:
+        path: /usr/local/bin/calicoctl
+        owner: operator
+        group: operator
+        mode: '0555'
+
+    - name: Download calico-typha manifest
+      get_url:
+        url: https://docs.projectcalico.org/manifests/calico-typha.yaml
+        dest: /home/operator/calico-typha.yaml
+        mode: '0444'
+
+    - name: Deploy calico
+      command: kubectl apply -f /home/operator/calico-typha.yaml --kubeconfig=/etc/kubernetes/admin.conf
