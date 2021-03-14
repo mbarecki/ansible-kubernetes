@@ -2,7 +2,8 @@
 
 This repository contains ansible playbooks for installing Kubernetes cluster.
 
-I wanted to learn about Kubernetes and have possibility to create lab/test clusters. This was starting idea behind that project.  
+I wanted to learn about Kubernetes, related network plugins and have possibility to create lab/test clusters with ansible.  
+This was starting idea behind that project.  
 
 Cluster details:
 - single master
@@ -11,7 +12,7 @@ Cluster details:
 - container runtime - containerd
 - network plugin - Calico
 
-Cluster installation was tested on Ubuntu virtual machines.  
+Cluster installation was tested on Ubuntu Bionic virtual machines.  
 
 # Usage
 Install dependencies and add required settings to servers for Kubernetes cluster installation:
@@ -36,7 +37,10 @@ SSH key is used for Ansible authentication towards servers.
 More informations about deployment and configuration of test VMs which contain  
 related SSH public key can be found [here](https://github.com/mbarecki/kvm-ubuntu-server-deployer).
 
-Account is created by playbook on Kubernetes master which could be used to interact with cluster:
+***Note: SSH private key should be kept secret.  
+In this repository private key is added for test/lab purposes.***
+
+Account details on Kubernetes master which could be used to interact with cluster:
 ```console
 username: operator
 password: test
