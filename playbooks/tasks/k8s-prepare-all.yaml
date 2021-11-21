@@ -15,7 +15,7 @@
 - name: Disable swap - remove line from /etc/fstab
   lineinfile:
     path: /etc/fstab
-    regexp: '\/swapfile'
+    regexp: '\/swap'
     state: absent
     backup: yes
 
