@@ -2,6 +2,25 @@
   hostname:
     name: "{{ inventory_hostname }}"
 
+- name: Check if cloud.cfg.d directory exists
+  stat:
+    path: /etc/cloud/cloud.cfg.d
+  register: stat_cloud_result
+
+- name: Create file /etc/cloud/cloud.cfg.d/01_hostname.cfg
+  file:
+    path: /etc/cloud/cloud.cfg.d/01_hostname.cfg
+    state: touch
+  when: stat_cloud_result.stat.exists == True
+
+- name: Modify /etc/cloud/cloud.cfg.d/01_hostname.cfg for preserving updated hostname if server was provisioned with cloud-init
+  lineinfile:
+    path: /etc/cloud/cloud.cfg.d/01_hostname.cfg
+    regexp: "."
+    line: "preserve_hostname: true"
+    backup: yes
+  when: stat_cloud_result.stat.exists == True
+
 - name: Modify /etc/hosts file 127.0.1.1 entry to match inventory name
   lineinfile:
     path: /etc/hosts
