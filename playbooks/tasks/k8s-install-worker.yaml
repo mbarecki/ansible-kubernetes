@@ -1,0 +1,8 @@
+- name: Check if kubelet.conf file exists
+  stat:
+    path: /etc/kubernetes/kubelet.conf
+  register: stat_result
+
+- name: Join worker to cluster (depending on kubelet.conf file presence)
+  command: "{{ hostvars['K8S_WORKER']['join_cluster'] }}"
+  when: stat_result.stat.exists == False
