@@ -1,7 +1,8 @@
-- name: Add master from inventory to /etc/hosts file
+- name: Add control plane from inventory to /etc/hosts file
   lineinfile:
     dest: /etc/hosts
     line: "{{ hostvars[item].ansible_host }} {{item}}"
     state: present
+    backup: yes
   when: hostvars[item].ansible_host is defined
-  with_items: "{{ groups.master }}"
+  with_items: "{{ groups.control_plane }}"

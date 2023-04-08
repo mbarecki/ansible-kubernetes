@@ -1,5 +1,5 @@
-[master]
-k8smaster ansible_host=1.2.3.4 ansible_user=test ansible_ssh_private_key_file=id_rsa_test
+[control_plane]
+k8sctlplane ansible_host=1.2.3.4 ansible_user=test ansible_ssh_private_key_file=id_rsa_test
 
 [workers]
 k8sworker01 ansible_host=1.2.3.5 ansible_user=test ansible_ssh_private_key_file=id_rsa_test
