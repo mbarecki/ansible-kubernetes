@@ -6,13 +6,13 @@ I wanted to learn about Kubernetes, related network plugins and have possibility
 This was starting idea behind that project.  
 
 Cluster details:
-- single master
+- single control plane node
 - multiple workers
 - installation with kubeadm
 - container runtime - containerd
 - network plugin - Calico
 
-Cluster installation was tested on Ubuntu Bionic virtual machines.  
+Cluster installation was tested on Ubuntu Bionic, Jammy virtual machines.  
 
 # Usage
 Install dependencies and add required settings to servers for Kubernetes cluster installation:
@@ -40,7 +40,7 @@ related SSH public key can be found [here](https://github.com/mbarecki/kvm-ubunt
 ***Note: SSH private key should be kept secret.  
 In this repository private key is added for test/lab purposes.***
 
-Account details on Kubernetes master which could be used to interact with cluster:
+Account details on Kubernetes control plane node which could be used to interact with cluster:
 ```console
 username: operator
 password: test

@@ -2,30 +2,17 @@
   hostname:
     name: "{{ inventory_hostname }}"
 
-- name: Check if cloud.cfg.d directory exists
-  stat:
-    path: /etc/cloud/cloud.cfg.d
-  register: stat_cloud_result
-
-- name: Create file /etc/cloud/cloud.cfg.d/01_hostname.cfg
-  file:
-    path: /etc/cloud/cloud.cfg.d/01_hostname.cfg
-    state: touch
-  when: stat_cloud_result.stat.exists == True
-
-- name: Modify /etc/cloud/cloud.cfg.d/01_hostname.cfg for preserving updated hostname if server was provisioned with cloud-init
-  lineinfile:
-    path: /etc/cloud/cloud.cfg.d/01_hostname.cfg
-    regexp: "."
-    line: "preserve_hostname: true"
-    backup: yes
-  when: stat_cloud_result.stat.exists == True
-
 - name: Modify /etc/hosts file 127.0.1.1 entry to match inventory name
   lineinfile:
     path: /etc/hosts
     regexp: '^127\.0\.1\.1'
     line: "127.0.1.1 {{ inventory_hostname }}"
+    backup: yes
+
+- name: Add localhost to hosts
+  lineinfile:
+    path: /etc/hosts
+    line: "127.0.0.1 localhost"
     backup: yes
 
 - name: Disable swap (command)
@@ -51,9 +38,9 @@
     - software-properties-common
     - gnupg
 
-- name: Add modules for containerd
+- name: Add modules for kubernetes
   blockinfile:
-    path: /etc/modules-load.d/containerd.conf
+    path: /etc/modules-load.d/kubernetes.conf
     create: yes
     block: |
       overlay
@@ -77,23 +64,6 @@
 - name: Apply sysctl parameters
   command: sysctl --system
 
-- name: Install containerd
-  apt:
-    name: containerd
-    force_apt_get: yes
-    update_cache: yes
-
-- name: Create directory for containerd configuration
-  file:
-    path: /etc/containerd
-    state: directory
-
-- name: Containerd configuration
-  shell: containerd config default | sudo tee /etc/containerd/config.toml
-
-- name: Restart containerd
-  command: systemctl restart containerd
-  
 - name: Add Kubernetes Apt signing key
   apt_key:
     url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
@@ -114,3 +84,8 @@
     - kubelet={{ k8s_version }}
     - kubeadm={{ k8s_version }}
     - kubectl={{ k8s_version }}
+
+- name: Copy crictl configuration file
+  template:
+    src: crictl.yaml
+    dest: /etc/crictl.yaml

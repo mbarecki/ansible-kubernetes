@@ -1,7 +1,8 @@
-- hosts: master
+- hosts: control_plane
   become: yes
   tasks:
-    - include_tasks: tasks/k8s-prepare-master.yaml
+    - include_tasks: tasks/add-operator-user.yaml
+    - include_tasks: tasks/k8s-prepare-control-plane.yaml
 
 - hosts: workers
   become: yes
@@ -11,4 +12,6 @@
 - hosts: all
   become: yes
   tasks:
+    - include_tasks: tasks/configure-cloud-init.yaml
+    - include_tasks: tasks/install-container-runtime.yaml
     - include_tasks: tasks/k8s-prepare-all.yaml

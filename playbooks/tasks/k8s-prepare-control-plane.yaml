@@ -3,16 +3,9 @@
     dest: /etc/hosts
     line: "{{ hostvars[item].ansible_host }} {{item}}"
     state: present
+    backup: yes
   when: hostvars[item].ansible_host is defined
   with_items: "{{ groups.workers }}"
-
-- name: Add user for Kubernetes operator (password test)
-  user:
-    name: operator
-    shell: /bin/bash
-    groups: sudo
-    password: "{{ 'test' | password_hash('sha512') }}"
-    append: yes
 
 - name: Create directory for Kubernetes config
   file:
