@@ -1,9 +1,9 @@
 - name: Download calicoctl
   get_url:
-    url: https://github.com/projectcalico/calicoctl/releases/download/{{ calicoctl_version }}/calicoctl
+    url: https://github.com/projectcalico/calico/releases/download/{{ calicoctl_version }}/calicoctl-linux-amd64
     dest: /usr/local/bin/calicoctl
     mode: '0555'
-    
+
 - name: Change calicoctl ownership, group and permissions
   file:
     path: /usr/local/bin/calicoctl
@@ -11,11 +11,23 @@
     group: operator
     mode: '0555'
 
-- name: Download calico-typha manifest
+- name: Download calico manifest
   get_url:
-    url: https://docs.projectcalico.org/manifests/calico-typha.yaml
-    dest: /home/operator/calico-typha.yaml
-    mode: '0444'
+    url: https://raw.githubusercontent.com/projectcalico/calico/{{ calicoctl_version }}/manifests/calico.yaml
+    dest: /home/operator/calico.yaml
+    mode: '0664'
+    owner: operator
+    group: operator
+
+- name: Copy default ipv4 ippool definition
+  template:
+    src: default-ipv4-ippool.yaml
+    dest: /home/operator/default-ipv4-ippool.yaml
 
 - name: Deploy calico
-  command: kubectl apply -f /home/operator/calico-typha.yaml --kubeconfig=/etc/kubernetes/admin.conf
+  command: kubectl apply -f /home/operator/calico.yaml --kubeconfig=/etc/kubernetes/admin.conf
+
+- name: Deploy default ipv4 ippool
+  command: calicoctl apply -f /home/operator/default-ipv4-ippool.yaml
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
