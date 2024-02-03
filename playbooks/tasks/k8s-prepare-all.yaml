@@ -64,16 +64,6 @@
 - name: Apply sysctl parameters
   command: sysctl --system
 
-- name: Add Kubernetes Apt signing key
-  apt_key:
-    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
-    state: present
-
-- name: Add kubernetes repository into sources list
-  apt_repository:
-    repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
-    state: present
-
 - name: Install packages for kubernetes
   apt:
     name: "{{ packages }}"
@@ -81,9 +71,9 @@
     force_apt_get: yes
   vars:
     packages:
-    - kubelet={{ k8s_version }}
-    - kubeadm={{ k8s_version }}
-    - kubectl={{ k8s_version }}
+    - kubelet={{ k8s_version }}{{ apt_k8s_package_version_suffix }}
+    - kubeadm={{ k8s_version }}{{ apt_k8s_package_version_suffix }}
+    - kubectl={{ k8s_version }}{{ apt_k8s_package_version_suffix }}
 
 - name: Copy crictl configuration file
   template:
