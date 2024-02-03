@@ -1,4 +1,5 @@
-k8s_version: 1.26.3-00
-calicoctl_version: v3.25.1
+k8s_version: 1.28.6
+apt_k8s_package_version_suffix: "-1.1"
+calicoctl_version: v3.27.0
 service_Subnet: 10.95.0.0/16
 pod_Subnet: 10.245.0.0/16

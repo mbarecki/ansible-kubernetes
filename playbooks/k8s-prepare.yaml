@@ -12,6 +12,7 @@
 - hosts: all
   become: yes
   tasks:
+    - include_tasks: tasks/k8s-add-repository.yaml
     - include_tasks: tasks/configure-cloud-init.yaml
     - include_tasks: tasks/install-container-runtime.yaml
     - include_tasks: tasks/k8s-prepare-all.yaml
