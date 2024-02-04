@@ -3,6 +3,6 @@
     path: /etc/kubernetes/kubelet.conf
   register: stat_result
 
-- name: Join worker to cluster (depending on kubelet.conf file presence)
-  command: "{{ hostvars['K8S_WORKER']['join_cluster'] }}"
+- name: Join worker to cluster
+  command: "{{ hostvars['K8S_WORKER']['join_cluster_worker'] }}"
   when: stat_result.stat.exists == False

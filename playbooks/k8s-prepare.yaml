@@ -1,15 +1,10 @@
-- hosts: control_plane
+- hosts: init
   become: yes
   tasks:
     - include_tasks: tasks/add-operator-user.yaml
-    - include_tasks: tasks/k8s-prepare-control-plane.yaml
+    - include_tasks: tasks/k8s-prepare-init.yaml
 
-- hosts: workers
-  become: yes
-  tasks:
-    - include_tasks: tasks/k8s-prepare-worker.yaml
-
-- hosts: all
+- hosts: init control_plane worker
   become: yes
   tasks:
     - include_tasks: tasks/k8s-add-repository.yaml

@@ -1,0 +1,23 @@
+- name: Install haproxy
+  ansible.builtin.apt:
+    update_cache: yes
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - haproxy
+
+- name: Copy haproxy config file
+  template:
+    src: haproxy.cfg
+    dest: /etc/haproxy/haproxy.cfg
+
+- name: Reload service httpd, in all cases
+  ansible.builtin.service:
+    name: haproxy
+    state: reloaded
+
+- name: Start service haproxy
+  ansible.builtin.service:
+    name: haproxy
+    enabled: true
+    state: started
