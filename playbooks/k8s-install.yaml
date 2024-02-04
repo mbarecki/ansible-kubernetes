@@ -1,9 +1,16 @@
-- hosts: control_plane
+- hosts: init
   become: yes
   tasks:
-    - include_tasks: tasks/k8s-install-control-plane.yaml
-    
-- hosts: workers
+    - include_tasks: tasks/k8s-install-init.yaml
+
+- hosts: control_plane
   become: yes
+  serial: 1
+  tasks:
+    - include_tasks: tasks/k8s-install-control-plane.yaml
+
+- hosts: worker
+  become: yes
+  serial: 1
   tasks:
     - include_tasks: tasks/k8s-install-worker.yaml

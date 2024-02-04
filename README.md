@@ -5,8 +5,9 @@ This repository contains ansible playbooks for installing Kubernetes cluster.
 I wanted to learn about Kubernetes, related network plugins and have possibility to create lab/test clusters with ansible.  
 This was starting idea behind that project.  
 
+
 Cluster details:
-- single control plane node
+- single control plane node / highly available control plane
 - multiple workers
 - installation with kubeadm
 - container runtime - containerd
@@ -15,19 +16,44 @@ Cluster details:
 Cluster installation was tested on Ubuntu Bionic, Jammy virtual machines.  
 
 # Usage
+
+## cluster installation with single control plane node
+
 Install dependencies and add required settings to servers for Kubernetes cluster installation:
 ```console
-ansible-playbook -i hosts playbooks/k8s-prepare.yaml
+ansible-playbook -i k8s1.yaml playbooks/k8s-prepare.yaml
 ```
 
 Install Kubernetes cluster:
 ```console
-ansible-playbook -i hosts playbooks/k8s-install.yaml
+ansible-playbook -i k8s1.yaml playbooks/k8s-install.yaml
 ```
 
 Deploy Calico in Kubernetes cluster:
 ```console
-ansible-playbook -i hosts playbooks/calico-install.yaml
+ansible-playbook -i k8s1.yaml playbooks/calico-install.yaml
+```
+
+## cluster installation with highly available control plane
+
+Install dependencies and add configuration to control plane load balancer:
+```console
+ansible-playbook -i k8s2.yaml playbooks/lb-install.yaml
+```
+
+Install dependencies and add required settings to servers for Kubernetes cluster installation:
+```console
+ansible-playbook -i k8s2.yaml playbooks/k8s-prepare.yaml
+```
+
+Install Kubernetes cluster:
+```console
+ansible-playbook -i k8s2.yaml playbooks/k8s-install.yaml
+```
+
+Deploy Calico in Kubernetes cluster:
+```console
+ansible-playbook -i k8s2.yaml playbooks/calico-install.yaml
 ```
 
 # Authentication

@@ -1,0 +1,4 @@
+- hosts: lb_control_plane
+  become: yes
+  tasks:
+    - include_tasks: tasks/lb-install.yaml
