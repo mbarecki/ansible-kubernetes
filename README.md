@@ -19,6 +19,12 @@ Cluster installation was tested on Ubuntu Bionic, Jammy virtual machines.
 
 ## cluster installation with single control plane node
 
+Update files:
+- [k8s1.yaml](k8s1.yaml)
+- [group_vars/k8s1.yaml](./group_vars/k8s1.yaml)
+
+with correct IP addresses for the cluster.
+
 Install dependencies and add required settings to servers for Kubernetes cluster installation:
 ```console
 ansible-playbook -i k8s1.yaml playbooks/k8s-prepare.yaml
@@ -35,6 +41,12 @@ ansible-playbook -i k8s1.yaml playbooks/calico-install.yaml
 ```
 
 ## cluster installation with highly available control plane
+
+Update files:
+- [k8s2.yaml](k8s2.yaml)
+- [group_vars/k8s2.yaml](./group_vars/k8s2.yaml)
+
+with correct IP addresses for the cluster.
 
 Install dependencies and add configuration to control plane load balancer:
 ```console
@@ -81,4 +93,5 @@ python3 -m venv /tmp/ansible
 source /tmp/ansible/bin/activate
 python3 -m pip install -U pip
 python3 -m pip install ansible
+python3 -m pip install passlib
 ```
